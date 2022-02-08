@@ -1,4 +1,4 @@
-Create an api that exposes the necesary end points for a CRUD of the following data:
+Create an api that exposes the necessary end points for a CRUD of the following data:
 - Employees, they should have a name, lastname, employeeId and workflow type (crates or buckets)
 - Crew, they contain Employees, and have a name of it's own and an extra attribute to describe a ranch (Name: "Crew1", Ranch: "Rancho1")
 The api should store the data in a local sqlite db.
