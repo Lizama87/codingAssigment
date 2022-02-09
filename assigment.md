@@ -13,3 +13,5 @@ Constrains:
 once you're done, share the repo link to submit it for revision.
 
 Phase 2:
+Modify the existing endpoints to take a json on their's incoming/outcoming payload
+constrain: use the the newtonsoft nuget package
