@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using codingAssigment;
 using codingAssigment.Data;
+using Newtonsoft.Json;
 
 namespace codingAssigment.Controllers
 {
@@ -26,21 +27,24 @@ namespace codingAssigment.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
-            return Ok(await _context.Employees.ToListAsync());
+            List<Employee> employees = await _context.Employees.ToListAsync();
+            string json = JsonConvert.SerializeObject(employees, Formatting.Indented);
+            return Ok(json);
         }
 
         // GET: api/Employees/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Employee>> GetEmployee(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            Employee employee = await _context.Employees.FindAsync(id);
 
             if (employee == null)
             {
                 return NotFound();
             }
 
-            return Ok(employee);
+            string json = JsonConvert.SerializeObject(employee, Formatting.Indented);
+            return Ok(json);
         }
 
         // PUT: api/Employees/{id}
