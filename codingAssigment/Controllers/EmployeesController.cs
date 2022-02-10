@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using codingAssigment;
 using codingAssigment.Data;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace codingAssigment.Controllers
 {
@@ -79,12 +80,48 @@ namespace codingAssigment.Controllers
 
         // POST: api/Employees
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        public async Task<ActionResult<Employee>> PostEmployee(JToken employeeJson)
         {
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
+            if (employeeJson is JArray)
+			{
+                List<Employee> employees = null;
 
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+                try
+				{
+                    employees = JsonConvert.DeserializeObject<List<Employee>>(employeeJson.ToString());
+				}
+                catch (JsonSerializationException ex)
+				{
+                    return BadRequest("Error in Json Format");
+                }
+                
+                if (employees == null)
+                    return BadRequest();
+
+                _context.Employees.AddRange(employees);
+            }
+            else if (employeeJson is JObject)
+			{
+                Employee employee = null;
+                try
+                {
+                    employee = JsonConvert.DeserializeObject<Employee>(employeeJson.ToString());
+                }
+                catch (JsonSerializationException ex)
+                {
+                    return BadRequest("Error in Json Format");
+                }
+
+                if (employee == null)
+                    return BadRequest();
+
+                _context.Employees.Add(employee);
+            }
+            else
+                return BadRequest();
+
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         // DELETE: api/Employees/{id}

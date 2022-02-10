@@ -1,4 +1,6 @@
-﻿namespace codingAssigment
+﻿using Newtonsoft.Json.Converters;
+
+namespace codingAssigment
 {
 	public class BodyCrew
 	{
@@ -7,4 +9,5 @@
 		public string Ranch { get; set; }
 		public IEnumerable<int> EmployeesIDs { get; set; } = new List<int>();
 	}
+
 }
