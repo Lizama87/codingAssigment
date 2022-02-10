@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using codingAssigment;
 using codingAssigment.Data;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace codingAssigment.Controllers
 {
@@ -61,7 +62,7 @@ namespace codingAssigment.Controllers
             crew.Name = bodyCrew.Name;
             crew.Ranch = bodyCrew.Ranch;
             crew.Employees = new List<Employee>();
-            crew.Employees = await _context.Employees.Where(e => bodyCrew.EmployeesIDs.Contains(e.Id)).ToListAsync();
+            crew.Employees = await _context.Employees.Where(e => bodyCrew.Employees.Contains(e.Id)).ToListAsync();
             
             _context.Entry(crew).State = EntityState.Modified;
 
@@ -86,20 +87,70 @@ namespace codingAssigment.Controllers
 
         // POST: api/Crews
         [HttpPost]
-        public async Task<ActionResult<Crew>> PostCrew(BodyCrew bodyCrew)
+        public async Task<ActionResult<Crew>> PostCrew(JToken crewJson)
         {
-            Crew crew = new Crew();
+            if (crewJson is JArray)
+            {
+                List<BodyCrew> unformatCrews = null;
 
-            crew.Id = bodyCrew.Id;
-            crew.Name = bodyCrew.Name;
-            crew.Ranch = bodyCrew.Ranch;
-            crew.Employees = await _context.Employees.Where(e => bodyCrew.EmployeesIDs.Contains(e.Id)).ToListAsync();
+                try
+                {
+                    unformatCrews = JsonConvert.DeserializeObject<List<BodyCrew>>(crewJson.ToString());
+                }
+                catch (JsonSerializationException ex)
+                {
+                    return BadRequest("Error in Json Format");
+                }
 
+                if (unformatCrews == null)
+                    return BadRequest();
 
-            _context.Crews.Add(crew);
+                List<Crew> crews = new List<Crew>();
+
+                foreach (BodyCrew unformatCrew in unformatCrews)
+                {
+                    Crew crew = new Crew();
+
+                    crew.Id = unformatCrew.Id;
+                    crew.Name = unformatCrew.Name;
+                    crew.Ranch = unformatCrew.Ranch;
+                    crew.Employees = await _context.Employees.Where(e => unformatCrew.Employees.Contains(e.Id)).ToListAsync();
+
+                    crews.Add(crew);
+                }
+                _context.Crews.AddRange(crews);
+            }
+            else if (crewJson is JObject)
+            {
+                BodyCrew unformatCrew = null;
+
+                try
+                {
+                    unformatCrew = JsonConvert.DeserializeObject<BodyCrew>(crewJson.ToString());
+                }
+                catch (JsonSerializationException ex)
+                {
+                    return BadRequest("Error in Json Format");
+                }
+
+                if (unformatCrew == null)
+                    return BadRequest();
+
+                Crew crew = new Crew();
+
+                crew.Id = unformatCrew.Id;
+                crew.Name = unformatCrew.Name;
+                crew.Ranch = unformatCrew.Ranch;
+                crew.Employees = await _context.Employees.Where(e => unformatCrew.Employees.Contains(e.Id)).ToListAsync();
+
+                _context.Crews.Add(crew);
+            }
+            else
+                return BadRequest();
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCrew", new { id = crew.Id }, crew);
+            return Ok();
         }
 
         // DELETE: api/Crews/{id}
@@ -117,5 +168,6 @@ namespace codingAssigment.Controllers
 
             return NoContent();
         }
+    
     }
 }
