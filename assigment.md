@@ -14,4 +14,9 @@ once you're done, share the repo link to submit it for revision.
 
 Phase 2:
 Modify the existing endpoints to take a json on their's incoming/outcoming payload
-constrain: use the the newtonsoft nuget package
+constrain: use the the newtonsoft nuget package.
+
+Phase 3:
+Adjust the project to enable CORS for the following domains: 
+- https://localhost:7006
+- http://localhost:5032
