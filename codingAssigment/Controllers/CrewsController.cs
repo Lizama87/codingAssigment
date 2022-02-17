@@ -157,7 +157,8 @@ namespace codingAssigment.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCrew(int id)
         {
-            var crew = await _context.Crews.FindAsync(id);
+            Crew crew = await _context.Crews.Include(x => x.Employees).FirstOrDefaultAsync(x => x.Id == id);
+
             if (crew == null)
             {
                 return NotFound();

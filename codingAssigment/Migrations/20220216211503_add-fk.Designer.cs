@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using codingAssigment.Data;
 
@@ -10,9 +11,10 @@ using codingAssigment.Data;
 namespace codingAssigment.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220216211503_add-fk")]
+    partial class addfk
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.2");
@@ -43,6 +45,7 @@ namespace codingAssigment.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("CrewId")
+                        .IsRequired()
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCrates")
@@ -67,7 +70,9 @@ namespace codingAssigment.Migrations
                 {
                     b.HasOne("codingAssigment.Crew", "Crew")
                         .WithMany("Employees")
-                        .HasForeignKey("CrewId");
+                        .HasForeignKey("CrewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Crew");
                 });
